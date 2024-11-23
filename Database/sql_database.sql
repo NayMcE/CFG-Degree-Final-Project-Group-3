@@ -1,6 +1,8 @@
 CREATE database game_storage;
 
+
 USE game_storage;
+
 
 CREATE table player
 (
@@ -9,12 +11,14 @@ player_name VARCHAR(200) NOT NULL,
 CONSTRAINT pk_player_id PRIMARY KEY (player_id)
 );
 
+
 CREATE table items
 (
 item_id int NOT NULL,
 item_name VARCHAR(200) NOT NULL,
 CONSTRAINT pk_item_id PRIMARY KEY (item_id)
 );
+
 
 CREATE table actions
 (
@@ -23,24 +27,17 @@ action_name VARCHAR(200) NOT NULL,
 CONSTRAINT pk_action_id PRIMARY KEY (action_id)
 );
 
-CREATE table player_collection
+
+CREATE table stats
 (
-player_collection_id int NOT NULL AUTO_INCREMENT PRIMARY KEY,
+stats_id int NOT NULL AUTO_INCREMENT PRIMARY KEY,
 player_id int NOT NULL,
 item_id int NOT NULL,
-CONSTRAINT pk_player FOREIGN KEY (player_id)
+action_id int NOT NULL,
+CONSTRAINT pk_player_stats FOREIGN KEY (player_id)
 REFERENCES player(player_id),
 CONSTRAINT pk_items_collected FOREIGN KEY (item_id)
-REFERENCES items(item_id)
-);
-
-CREATE table player_actions
-(
-player_action_id int NOT NULL AUTO_INCREMENT PRIMARY KEY,
-player_id int NOT NULL,
-action_id int NOT NULL,
-CONSTRAINT pk_players_actions FOREIGN KEY (player_id)
-REFERENCES player(player_id),
+REFERENCES items(item_id),
 CONSTRAINT pk_actions_taken FOREIGN KEY (action_id)
 REFERENCES actions(action_id)
 );
@@ -51,6 +48,7 @@ VALUES
 ("1", "Mad Hatters Hat"),
 ("2", "Cup of tea")
 ;
+
 
 INSERT INTO actions (action_id, action_name)
 VALUES

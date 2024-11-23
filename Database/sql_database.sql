@@ -55,3 +55,22 @@ VALUES
 ("1", "Climbed ladder"),
 ("2", "Fell in rabbit hole")
 ;
+
+
+-- JOIN TO DISPLAY PLAYER NAME, ITEMS COLLECTED AND HOW MANY LADDERS CLIMBED/RABBIT HOLES FALLEN INTO
+
+SELECT
+    p.player_name,
+    COUNT(DISTINCT s.item_id) AS items_collected,
+    SUM(CASE WHEN a.action_name = 'Climbed ladder' THEN 1 ELSE 0 END) AS ladders_climbed,
+    SUM(CASE WHEN a.action_name = 'Fell in rabbit hole' THEN 1 ELSE 0 END) AS rabbit_holes_fell_down
+FROM
+    player p
+LEFT JOIN
+    stats s ON p.player_id = s.player_id
+LEFT JOIN
+    items i ON s.item_id = i.item_id
+LEFT JOIN
+    actions a ON s.action_id = a.action_id
+GROUP BY
+    p.player_id, p.player_name;

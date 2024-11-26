@@ -1,6 +1,5 @@
 CREATE database game_storage;
 
-
 USE game_storage;
 
 

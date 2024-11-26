@@ -13,7 +13,7 @@ pygame.display.set_caption("Roll the Dice")
 # Load dice images (ensure these images are in the same folder as your script)
 # Load and resize dice images
 dice_images = [
-    pygame.transform.scale(pygame.image.load(f'dice{i}.png'), (100, 100)) for i in range(1, 7)
+    pygame.transform.scale(pygame.image.load(f'Images/dice_{i}.png'), (100, 100)) for i in range(1, 7)
 ]
 
 

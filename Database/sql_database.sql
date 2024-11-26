@@ -1,13 +1,15 @@
 CREATE database game_storage;
 
+
 USE game_storage;
 
 
 CREATE table player
 (
 player_id int NOT NULL AUTO_INCREMENT,
-player_name VARCHAR(200) NOT NULL,
-CONSTRAINT pk_player_id PRIMARY KEY (player_id)
+player_character VARCHAR(200) NOT NULL,
+CONSTRAINT pk_player_id PRIMARY KEY (player_id),
+CONSTRAINT uq_player_character UNIQUE (player_character)
 );
 
 
@@ -15,6 +17,7 @@ CREATE table items
 (
 item_id int NOT NULL,
 item_name VARCHAR(200) NOT NULL,
+item_score VARCHAR(200),
 CONSTRAINT pk_item_id PRIMARY KEY (item_id)
 );
 
@@ -42,11 +45,11 @@ REFERENCES actions(action_id)
 );
 
 
-INSERT INTO items (item_id, item_name)
-VALUES
-("1", "Teacup"),
-;
 
+INSERT INTO items (item_id, item_name, score)
+VALUES
+("1", "Teacup", "5")
+;
 
 INSERT INTO actions (action_id, action_name)
 VALUES
@@ -54,3 +57,11 @@ VALUES
 ("2", "Fell in rabbit hole")
 ;
 
+
+INSERT INTO player (player_character)
+VALUES
+("Alice"),
+("Cheshire Cat"),
+("Caterpillar"),
+("White Rabbit")
+;

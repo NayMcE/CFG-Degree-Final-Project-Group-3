@@ -10,7 +10,7 @@ SCREEN_HEIGHT = 600
 
 # Set up the display
 screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
-pygame.display.set_caption("Board Game")
+pygame.display.set_caption("Snakes and Ladders")
 
 # Load the background image
 background = pygame.image.load("Alice-In-Wonderland_Board_Game.png")

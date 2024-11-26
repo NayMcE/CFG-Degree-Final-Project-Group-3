@@ -45,8 +45,7 @@ REFERENCES actions(action_id)
 
 INSERT INTO items (item_id, item_name)
 VALUES
-("1", "Mad Hatters Hat"),
-("2", "Cup of tea")
+("1", "Teacup"),
 ;
 
 

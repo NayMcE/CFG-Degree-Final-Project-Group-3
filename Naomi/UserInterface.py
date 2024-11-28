@@ -1,6 +1,7 @@
 import pygame
 import random
 
+
 # Initialize pygame
 pygame.init()
 
@@ -9,8 +10,6 @@ WIDTH = 800
 HEIGHT = 600
 SIDE_PANEL_WIDTH = 200
 DICE_SIZE = 100
-
-
 
 # Colors (for other elements like side panel)
 PINK = (252, 116, 183)
@@ -22,7 +21,7 @@ pygame.display.set_caption("Snakes and Ladders")
 # Load images
 background_image = pygame.image.load("Alice-In-Wonderland_Board_Game.png")
 background_image = pygame.transform.scale(background_image, (WIDTH, HEIGHT))  # Resize to fit the screen
-dice_images = [pygame.transform.scale(pygame.image.load(f"Images/dice_{i}.png"), (DICE_SIZE, DICE_SIZE)) for i in range(1, 7)]
+dice_images = [pygame.transform.scale(pygame.image.load(f"Images/dice_{i}.jpeg"), (DICE_SIZE, DICE_SIZE)) for i in range(1, 7)]
 dice_rect = dice_images[0].get_rect(center=(WIDTH + SIDE_PANEL_WIDTH // 2, HEIGHT // 2))  # Centered in side panel
 
 # Function to draw the side panel with dice
@@ -35,16 +34,17 @@ def roll_dice_animation():
     for _ in range(roll_count):
         # Display random dice face during the animation
         random_face = random.choice(dice_images)
+        # screen.fill(WHITE)  # Clear the screen
         screen.blit(random_face, (100, 100))
         pygame.display.update()
         pygame.time.delay(50)  # Short delay to simulate animation
 
     # Final roll result
     roll_result = random.randint(1, 6)
+    # screen.fill(WHITE)
     screen.blit(dice_images[roll_result - 1], (100, 100))
     pygame.display.update()
     return roll_result
-
 # Main game loop
 def main():
     running = True
@@ -59,7 +59,7 @@ def main():
                 if event.key == pygame.K_SPACE:
                     # Trigger dice roll animation on space bar press
                     result = roll_dice_animation()
-                    print(f"You rolled a {result}")
+
 
         pygame.display.update()
         # Draw the pink side panel

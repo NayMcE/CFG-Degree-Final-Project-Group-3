@@ -1,11 +1,13 @@
 import pygame
 import random
 
+from charset_normalizer.cd import characters_popularity_compare
+
 # Initialize pygame
 pygame.init()
 
 # Constants
-WIDTH = 800
+WIDTH = 720
 HEIGHT = 600
 SIDE_PANEL_WIDTH = 200
 DICE_SIZE = 100
@@ -22,6 +24,8 @@ background_image = pygame.transform.scale(background_image, (WIDTH, HEIGHT))
 dice_images = [pygame.transform.scale(pygame.image.load(f"Images/dice_{i}.jpeg"), (DICE_SIZE, DICE_SIZE))
     for i in range(1, 7)]
 dice_rect = dice_images[0].get_rect(center=(WIDTH + SIDE_PANEL_WIDTH // 2, HEIGHT // 2))
+alice = pygame.image.load("Characters/Alice.png")
+cat = pygame.image.load("Characters/ChescherCat.png")
 
 # Function to draw the side panel with dice
 def draw_side_panel(dice_roll):
@@ -35,26 +39,40 @@ def roll_dice_animation():
         # Display random dice face during the animation
         random_face = random.choice(dice_images)
         # Clear the dice animation area
-        screen.fill(WHITE, (850, 250, DICE_SIZE, DICE_SIZE))
-        screen.blit(random_face, (850,250)) # Animation position
+        screen.fill(WHITE, (770, 250, DICE_SIZE, DICE_SIZE))
+        screen.blit(random_face, (770,250)) # Animation position
         # draw_side_panel(3)  # Keep the side panel visible
         pygame.display.update()
         pygame.time.delay(50) # Short delay to simulate animation
 
     # Final roll result
     roll_result = random.randint(1, 6)
-    screen.fill(WHITE, (800, 100, DICE_SIZE, DICE_SIZE))
-    screen.blit(dice_images[roll_result - 1], (800, 100))
+    screen.fill(WHITE, (770, 250, DICE_SIZE, DICE_SIZE))
+    screen.blit(dice_images[roll_result - 1], (770, 250))
     draw_side_panel(roll_result)  # Update side panel with final roll
     pygame.display.update()
     return roll_result
 
-class BoardGame:
-    def __init__(self):
-        self.ladders = {}
-        self.rabbithole = {}
-        self.players = {1:alice, 2: white_rabbit}
-        self.positions = {1:0}
+# class BoardGame:
+#     def __init__(self):
+#         self.board = []
+#         self.ladders = {4:10, 11:22, 18:29}
+#         self.rabbithole = {12:1, 17:12, 28:17}
+#         self.players = {1:alice, 2: cat}
+#         self.positions = {1:0, 2:0} #player starting positions
+#         self.current_player = 1
+
+
+        # for i in range(0,10):
+        #     temp =[]
+        #     for j in range(0,10):
+        #         x = j*60
+        #         y = i*60
+        #         temp.append((x,y,count))
+        #         count += 1
+        #     self.board.append(temp)
+
+
 # Main game loop
 def main():
     running = True

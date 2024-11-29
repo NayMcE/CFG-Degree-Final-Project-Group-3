@@ -31,13 +31,13 @@ def draw_side_panel(dice_roll):
 # Function to animate dice roll
 def roll_dice_animation():
     roll_count = 10  # Number of frames in the roll animation
-    for _ in range(roll_count):
+    for i in range(roll_count):
         # Display random dice face during the animation
         random_face = random.choice(dice_images)
         # Clear the dice animation area
-        screen.fill(WHITE, (800, 100, DICE_SIZE, DICE_SIZE))
-        screen.blit(random_face, (800,100)) # Animation position
-        draw_side_panel(1)  # Keep the side panel visible
+        screen.fill(WHITE, (850, 250, DICE_SIZE, DICE_SIZE))
+        screen.blit(random_face, (850,250)) # Animation position
+        # draw_side_panel(3)  # Keep the side panel visible
         pygame.display.update()
         pygame.time.delay(50) # Short delay to simulate animation
 
@@ -49,6 +49,12 @@ def roll_dice_animation():
     pygame.display.update()
     return roll_result
 
+class BoardGame:
+    def __init__(self):
+        self.ladders = {}
+        self.rabbithole = {}
+        self.players = {1:alice, 2: white_rabbit}
+        self.positions = {1:0}
 # Main game loop
 def main():
     running = True
@@ -68,9 +74,9 @@ def main():
 
         pygame.display.update()
 
-
+if __name__ == "__main__":
 # Run the game
-main()
+    main()
 
 # Quit pygame
-pygame.quit()
+    pygame.quit()

@@ -1,7 +1,7 @@
-CREATE database game_storage;
+CREATE database storage_database;
 
 
-USE game_storage;
+USE storage_database;
 
 
 CREATE table player
@@ -61,6 +61,4 @@ INSERT INTO player (player_character)
 VALUES
 ("Alice"),
 ("Cheshire Cat"),
-("Caterpillar"),
-("White Rabbit")
 ;

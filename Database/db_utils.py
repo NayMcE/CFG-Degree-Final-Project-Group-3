@@ -1,6 +1,7 @@
 import mysql.connector
 from jinja2.utils import Joiner
 
+
 import pymysql
 
 
@@ -13,15 +14,15 @@ class DbConnectionError(Exception):
 
 #connect database to PyGame
 def _db_connection():
-    cnx = pymysqlmysql.connect(
-        host=HOST,
-        user=USER,
-        password=PASSWORD,
-        database=DATABASE
+    cnx = pymysql.connect(
+        host = HOST,
+        user = USER,
+        password = PASSWORD,
+        database = DATABASE
     )
 
-    cursor = conn.cursor()
-    return cnx
+    cursor = cnx.cursor()
+    return cnx, cursor
 
 #function to save player details to database
 def save_player_details (character_name):

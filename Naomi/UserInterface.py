@@ -14,10 +14,11 @@ SIDE_PANEL_WIDTH = 200
 DICE_SIZE = 100
 WHITE = (255, 255, 255)
 PINK = (252, 116, 183)
+font = pygame.font.SysFont('Montserrat', 24)
 
 # Initialize screen
 screen = pygame.display.set_mode((WIDTH + SIDE_PANEL_WIDTH, HEIGHT))
-pygame.display.set_caption("Snakes and Ladders")
+pygame.display.set_caption("Rabbit Holes and Ladders")
 
 # Load board images
 background_image = pygame.image.load("Alice-In-Wonderland_Board_Game.png")
@@ -31,15 +32,21 @@ dice_rect = dice_images[0].get_rect(center=(WIDTH + SIDE_PANEL_WIDTH // 2, HEIGH
 # player images
 player_images = [
     pygame.image.load('Characters/Alice.png'),
-    pygame.image.load('Characters/ChescherCat.png')
+    pygame.image.load('Characters/CheshireCat.png')
 ]
 player_images = [pygame.transform.scale(img, (100, 100)) for img in player_images]
 
 
 # Function to draw the side panel with dice
-def draw_side_panel(dice_roll):
+def draw_side_panel(player_roll, computer_roll, dice_roll):
     pygame.draw.rect(screen, PINK, pygame.Rect(WIDTH, 0, SIDE_PANEL_WIDTH, HEIGHT))  # Side panel background
     screen.blit(dice_images[dice_roll - 1], dice_rect.topleft)  # Draw dice based on roll
+
+    # display rolls on sie panel for each character after they have rolled
+    text = font.render(f"Alice rolled: {player_roll}", True, (0, 0, 0))
+    screen.blit(text, (WIDTH + 10, 100))
+    text = font.render(f"Cat rolled: {computer_roll}", True, (0, 0, 0))
+    screen.blit(text, (WIDTH + 10, 150))
 
 ladders_and_rabbit_holes = {
     28: 17, #rabbit_hole
@@ -49,6 +56,62 @@ ladders_and_rabbit_holes = {
     11: 22, #ladder
     18: 29 #ladder
 }
+
+def display_rules():
+    """Display a pop-up window with the game rules."""
+    rules = [
+        "Welcome to Alice in Wonderland: Rabbit Holes and Ladders!",
+        "",
+        "Rules:",
+        "1. Press the SPACEBAR to roll the dice.",
+        "2. You are Alice and you will play first. Then the computer, the Cheshire\nCat will play next. Players take turns moving based on the dice roll.",
+        "3. Ladders move you up; rabbit holes bring you down to the rabbit\nhole below.",
+        "4. First player to reach position 30 wins!",
+        "",
+        "Press ENTER to start the game.",
+    ]
+
+    # Create a surface for the rules pop-up
+    popup_width = 800
+    popup_height = 500
+    popup = pygame.Surface((popup_width, popup_height))
+    popup.fill(WHITE)
+
+    # Draw a border around the pop-up
+    pygame.draw.rect(popup, PINK, popup.get_rect(), 5)
+
+    # Font settings
+    font = pygame.font.Font(None, 32)
+    title_font = pygame.font.Font(None, 48)
+
+    # Draw the title
+    title = title_font.render("Game Rules", True, (0, 0, 0))
+    popup.blit(title, ((popup_width - title.get_width()) // 2, 20))
+
+    # Render each line of the rules
+    y_offset = 70
+    for line in rules:
+        # split lines containing \n into seperate lines
+        split_lines = line.split('\n')
+        for sub_line in split_lines:
+            text = font.render(sub_line, True, (0, 0, 0))
+            popup.blit(text, (20, y_offset))
+            y_offset += 40
+
+    # Blit the pop-up onto the screen and wait for the user to press ENTER
+    while True:
+        screen.fill((0, 0, 0))  # Clear the screen
+        screen.blit(popup, ((WIDTH + SIDE_PANEL_WIDTH - popup_width) // 2, (HEIGHT - popup_height) // 2))
+        pygame.display.update()
+
+        # Wait for the user to press ENTER
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                sys.exit()
+            elif event.type == pygame.KEYDOWN and event.key == pygame.K_RETURN:
+                return  # Exit the rules screen
+
 
 # Function to animate dice roll
 def roll_dice_animation():
@@ -67,7 +130,7 @@ def roll_dice_animation():
     roll_result = random.randint(1, 6)
     screen.fill(WHITE, (770, 250, DICE_SIZE, DICE_SIZE))
     screen.blit(dice_images[roll_result - 1], (770, 250))
-    draw_side_panel(roll_result)  # Update side panel with final roll
+    # draw_side_panel(roll_result)  # Update side panel with final roll
     pygame.display.update()
     return roll_result
 
@@ -119,14 +182,18 @@ players_group = pygame.sprite.Group(Alice, Cat)
 
 # Main game loop
 def main():
+    display_rules()
     running = True
     dice_roll = 1  # Default dice roll to show on the side panel
+    player_roll = 0 # store Alice's roll
+    computer_roll = 0 # store the Cat's roll
     current_player = Alice
+    player_turn = True
 
     while running:
         # Draw the board and side panel
         screen.blit(background_image, (0, 0))
-        draw_side_panel(dice_roll)
+        draw_side_panel(player_roll, computer_roll, dice_roll)
 
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
@@ -135,10 +202,18 @@ def main():
                 if event.key == pygame.K_SPACE:
                     # Trigger dice roll animation on space bar press
                     dice_roll = roll_dice_animation()
+                    player_roll = dice_roll #save Alice's roll
                     # move the current player
                     current_player.move(dice_roll)
                     #switch players after the move
-                    current_player = Cat if current_player == Alice else Alice
+                    player_turn = False
+
+        # if it's the computer's turn (Cheshire Cat), roll automatically
+        if not player_turn:
+            dice_roll = roll_dice_animation()
+            computer_roll = dice_roll
+            Cat.move(dice_roll)
+            player_turn = True
 
 
         players_group.draw(screen)

@@ -1,5 +1,8 @@
+from pdb import post_mortem
+
 import pygame
 import random
+import sys
 
 from charset_normalizer.cd import characters_popularity_compare
 
@@ -18,19 +21,26 @@ PINK = (252, 116, 183)
 screen = pygame.display.set_mode((WIDTH + SIDE_PANEL_WIDTH, HEIGHT))
 pygame.display.set_caption("Snakes and Ladders")
 
-# Load images
+# Load board images
 background_image = pygame.image.load("Alice-In-Wonderland_Board_Game.png")
 background_image = pygame.transform.scale(background_image, (WIDTH, HEIGHT))
 dice_images = [pygame.transform.scale(pygame.image.load(f"Images/dice_{i}.jpeg"), (DICE_SIZE, DICE_SIZE))
     for i in range(1, 7)]
 dice_rect = dice_images[0].get_rect(center=(WIDTH + SIDE_PANEL_WIDTH // 2, HEIGHT // 2))
-alice = pygame.image.load("Characters/Alice.png")
-cat = pygame.image.load("Characters/ChescherCat.png")
+
+# player images
+player_images = [
+    pygame.image.load('Characters/Alice.png'),
+    pygame.image.load('Characters/ChescherCat.png')
+]
+player_images = [pygame.transform.scale(img, (100, 100)) for img in player_images]
+
 
 # Function to draw the side panel with dice
 def draw_side_panel(dice_roll):
     pygame.draw.rect(screen, PINK, pygame.Rect(WIDTH, 0, SIDE_PANEL_WIDTH, HEIGHT))  # Side panel background
     screen.blit(dice_images[dice_roll - 1], dice_rect.topleft)  # Draw dice based on roll
+
 
 # Function to animate dice roll
 def roll_dice_animation():
@@ -53,24 +63,40 @@ def roll_dice_animation():
     pygame.display.update()
     return roll_result
 
-# class BoardGame:
-#     def __init__(self):
-#         self.board = []
-#         self.ladders = {4:10, 11:22, 18:29}
-#         self.rabbithole = {12:1, 17:12, 28:17}
-#         self.players = {1:alice, 2: cat}
-#         self.positions = {1:0, 2:0} #player starting positions
-#         self.current_player = 1
 
+# map logical board positions to screen coordinates
+def get_screen_position(position):
+    board_positions = {
+        1: (20, 500), 2: (150, 500), 3: (250, 500), 4: (350, 500), 5: (450, 500), 6: (550, 500),
 
-        # for i in range(0,10):
-        #     temp =[]
-        #     for j in range(0,10):
-        #         x = j*60
-        #         y = i*60
-        #         temp.append((x,y,count))
-        #         count += 1
-        #     self.board.append(temp)
+    }
+    return board_positions.get(position, (0,0))
+
+class Player(pygame.sprite.Sprite):
+    def __init__(self, id, image):
+        super().__init__()
+        self.id = id
+        self.image = image
+        self.rect = self.image.get_rect()
+        self.position = 1
+
+        # initialise position on board
+        x, y = get_screen_position(self.position)
+        self.rect.topleft = (x, y)
+
+    def move(self,steps):
+        self.position += steps
+        if self.position > 100:
+            self.position = 100
+
+    def draw(self, screen):
+        screen.blit(self.image, self.rect.topleft)
+
+#create players
+Alice = Player(1, player_images[0])
+Cat = Player(2, player_images[1])
+
+players_group = pygame.sprite.Group(Alice, Cat)
 
 
 # Main game loop
@@ -89,7 +115,9 @@ def main():
                 if event.key == pygame.K_SPACE:
                     # Trigger dice roll animation on space bar press
                     dice_roll = roll_dice_animation()
+                    Alice.move(dice_roll)
 
+        players_group.draw(screen)
         pygame.display.update()
 
 if __name__ == "__main__":

@@ -89,7 +89,7 @@ class Player(pygame.sprite.Sprite):
         self.id = id
         self.image = image
         self.rect = self.image.get_rect()
-        self.position = 25
+        self.position = 1
 
         # initialise position on board
         x, y = get_screen_position(self.position)
@@ -147,6 +147,5 @@ def main():
 if __name__ == "__main__":
 # Run the game
     main()
-
 # Quit pygame
     pygame.quit()

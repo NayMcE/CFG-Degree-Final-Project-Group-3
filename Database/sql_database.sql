@@ -17,7 +17,6 @@ CREATE table items
 (
 item_id int NOT NULL,
 item_name VARCHAR(200) NOT NULL,
-item_score VARCHAR(200),
 CONSTRAINT pk_item_id PRIMARY KEY (item_id)
 );
 
@@ -46,9 +45,9 @@ REFERENCES actions(action_id)
 
 
 
-INSERT INTO items (item_id, item_name, score)
+INSERT INTO items (item_id, item_name)
 VALUES
-("1", "Teacup", "5")
+("1", "Teacup")
 ;
 
 INSERT INTO actions (action_id, action_name)

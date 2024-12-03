@@ -14,40 +14,42 @@ class DbConnectionError(Exception):
 
 #connect database to PyGame
 def _db_connection():
-    cnx = pymysql.connect(
-        host = HOST,
-        user = USER,
-        password = PASSWORD,
-        database = DATABASE
-    )
+    try:
+        cnx = pymysql.connect(
+            host = HOST,
+            user = USER,
+            password = PASSWORD,
+            database = DATABASE
+        )
 
-    cursor = cnx.cursor()
-    return cnx, cursor
+        cursor = cnx.cursor()
+        return cnx, cursor
+    except pymysql.MySQLError as e:
+        raise DbConnectionError(f"Database connection error: {e}")
 
 #function to save player details to database
-def save_player_details (character_name):
-    query = ("INSERT INTO player (character_name)")
-
-    cursor.execute(query, (character_name)),
-    conn.commit()
+def save_player_details(character_name):
+    query = "INSERT INTO player (player_character) VALUES (%s)"
+    cursor.execute(query, (character_name,))
+    db.commit()
 
 
 #function to save items player collected
 def save_player_items(item_name):
-    query = ("INSERT INTO items (item_name) VALUES (%s)")
+    query = "INSERT INTO items (item_name) VALUES (%s)"
+    cursor.execute(query, (item_name,))
+    db.commit()
 
-    cursor.execute(query, (item_name)),
-    conn.commit()
 
 #function to save players movements
 def save_player_actions(action_name):
-    query = ("INSERT INTO actions (action_name) VALUES (%s)")
+    query = "INSERT INTO actions (action_name) VALUES (%s)"
+    cursor.execute(query, (action_name,))
+    db.commit()
 
-    cursor.execute(query, (action_name)),
-    conn.commit()
 
 #function with join query to display player stats
-def fetch_player_stats(cursor):
+def fetch_player_stats():
     query = """
     SELECT 
         p.player_character,
@@ -67,6 +69,11 @@ def fetch_player_stats(cursor):
     """
     cursor.execute(query)
     return cursor.fetchall()
+
+
+def close_connection():
+    cursor.close()
+    db.close()
 
 
 if __name__ == '__main__':

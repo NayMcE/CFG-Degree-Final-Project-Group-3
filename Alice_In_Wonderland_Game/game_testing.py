@@ -1,6 +1,6 @@
 import unittest
 from unittest.mock import patch
-from UserInterface import Player, ladders_and_rabbit_holes, get_screen_position
+from game import Player, ladders_and_rabbit_holes, get_screen_position
 import pygame
 #
 # class TestRollDiceAnimationRandomness(unittest.TestCase):

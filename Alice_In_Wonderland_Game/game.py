@@ -54,6 +54,7 @@ ladders_and_rabbit_holes = {
     18: 29 #ladder
 }
 
+cup_positions = [2, 7, 24]
 
 class GamePopup:
     def __init__(self, screen, width, height, background_color, border_color, font):
@@ -64,6 +65,32 @@ class GamePopup:
         self.border_color = border_color
         self.font = font
 
+    def create_popup(self, content, title=None):
+        """Create a popup surface with the given content and title."""
+        popup = pygame.Surface((self.width, self.height))
+        popup.fill(self.background_color)
+
+        # Draw a border around the pop-up
+        pygame.draw.rect(popup, self.border_color, popup.get_rect(), 5)
+
+        # Add title if provided
+        y_offset = 20
+        if title:
+            title_font = pygame.font.Font(None, 48)
+            title_text = title_font.render(title, True, (0, 0, 0))
+            popup.blit(title_text, ((self.width - title_text.get_width()) // 2, y_offset))
+            y_offset += 50  # Space below the title
+
+        # Add content (supports multiline)
+        for line in content:
+            split_lines = line.split('\n')  # Handle manual line breaks
+            for sub_line in split_lines:
+                text = self.font.render(sub_line, True, (0, 0, 0))
+                popup.blit(text, (20, y_offset))
+                y_offset += 40
+
+        return popup
+
     def display_rules(self):
         """Display a pop-up window with the game rules."""
         rules = [
@@ -71,38 +98,17 @@ class GamePopup:
             "",
             "Rules:",
             "1. Press the SPACEBAR to roll the dice.",
-            "2. You are Alice and will play first. Then the computer, the Cheshire Cat, will play next. "
+            "2. You are Alice and will play first. Then the computer, the Cheshire Cat, will play next. \n"
             "Players take turns moving based on the dice roll.",
             "3. Ladders move you up; rabbit holes bring you down to the rabbit hole below.",
             "4. First player to reach position 30 wins!",
             "",
             "Press ENTER to start the game.",
         ]
-
-        popup = pygame.Surface((self.width, self.height))
-        popup.fill(self.background_color)
-
-        # Draw a border around the pop-up
-        pygame.draw.rect(popup, self.border_color, popup.get_rect(), 5)
-
-        # Font settings
-        title_font = pygame.font.Font(None, 48)
-
-        # Draw the title
-        title = title_font.render("Game Rules", True, (0, 0, 0))
-        popup.blit(title, ((self.width - title.get_width()) // 2, 20))
-
-        # Render each line of the rules
-        y_offset = 70
-        for line in rules:
-            split_lines = line.split('\n')
-            for sub_line in split_lines:
-                text = self.font.render(sub_line, True, (0, 0, 0))
-                popup.blit(text, (20, y_offset))
-                y_offset += 40
+        popup = self.create_popup(rules, title="Game Rules")
 
         while True:
-            self.screen.fill((0, 0, 0))
+            self.screen.fill((0, 0, 0))  # Clear the screen
             self.screen.blit(popup, ((WIDTH + SIDE_PANEL_WIDTH - self.width) // 2, (HEIGHT - self.height) // 2))
             pygame.display.update()
 
@@ -115,16 +121,19 @@ class GamePopup:
 
     def display_winner(self, winner_name):
         """Display a pop-up announcing the winner."""
-        popup = pygame.Surface((self.width, self.height))
-        popup.fill(self.background_color)
+        winner_message = [f"{winner_name} wins!", "Congratulations!"]
+        popup = self.create_popup(winner_message)
 
-        # Draw a border around the pop-up
-        pygame.draw.rect(popup, self.border_color, popup.get_rect(), 5)
+        # Show the popup
+        self.screen.fill((0, 0, 0))
+        self.screen.blit(popup, ((WIDTH + SIDE_PANEL_WIDTH - self.width) // 2, (HEIGHT - self.height) // 2))
+        pygame.display.update()
+        pygame.time.delay(2000)
 
-        # Winner text
-        text = self.font.render(f"{winner_name} wins!", True, (0, 0, 0))
-        text_rect = text.get_rect(center=(self.width // 2, self.height // 2))
-        popup.blit(text, text_rect)
+
+    def extra_roll(self, player_name):
+        message = [f"{player_name} landed on a cup! You get an extra roll!"]
+        popup = self.create_popup(message, title="Extra Roll")
 
         # Show the popup
         self.screen.fill((0, 0, 0))
@@ -162,6 +171,10 @@ def get_screen_position(position):
         19: (610, 140), 20: (490, 140), 21: (370, 140), 22: (250, 140), 23: (130, 140), 24: (20,140),
         25: (20, 20), 26: (130, 20), 27: (250, 20), 28: (370, 20), 29: (490, 20), 30: (610, 20)
     }
+    if position not in board_positions:
+        raise ValueError(f"Invalid board position: {position}")
+        # return board_positions[position]
+
     return board_positions.get(position, (0,0))
 
 class Player(pygame.sprite.Sprite):
@@ -178,8 +191,8 @@ class Player(pygame.sprite.Sprite):
 
     def move(self,steps):
         self.position += steps
-        if self.position > 100: #maximise the size of the screen
-            self.position = 100
+        if self.position > 30: #maximise the size of the screen
+            self.position = 30
 
         if self.position in ladders_and_rabbit_holes:
             self.position = ladders_and_rabbit_holes[self.position]
@@ -198,7 +211,6 @@ Cat = Player(2, player_images[1])
 players_group = pygame.sprite.Group(Alice, Cat)
 
 
-# Usage in Main Loop
 def main():
     popup = GamePopup(screen, 800, 500, WHITE, PINK, font)
     popup.display_rules()
@@ -207,7 +219,6 @@ def main():
     dice_roll = 1
     player_roll = 0
     computer_roll = 0
-    current_player = Alice
     player_turn = True
 
     while running:
@@ -217,26 +228,41 @@ def main():
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 running = False
+
             elif event.type == pygame.KEYDOWN:
-                dice_roll = roll_dice_animation()
-                player_roll = dice_roll
-                current_player.move(dice_roll)
-                player_turn = False
+                if player_turn:
+                    dice_roll = roll_dice_animation()
+                    player_roll = dice_roll
+                    Alice.move(dice_roll)
 
-            if current_player.position >= 30:
-                winner_name = 'Alice' if current_player == Alice else 'The Cheshire Cat'
-                popup.display_winner(winner_name)
-                running = False
-                break
+                    if Alice.position >= 30:
+                        popup.display_winner("Alice")
+                        running = False
+                        break
 
-            if not player_turn:
-                dice_roll = roll_dice_animation()
-                computer_roll = dice_roll
-                Cat.move(dice_roll)
-                player_turn = True
+                    if Alice.position in cup_positions:
+                        popup.extra_roll("Alice")
+                    else:
+                        player_turn = False
+
+                else:  # Computer turn
+                    dice_roll = roll_dice_animation()
+                    computer_roll = dice_roll
+                    Cat.move(dice_roll)
+
+                    if Cat.position >= 30:
+                        popup.display_winner("The Cheshire Cat")
+                        running = False
+                        break
+
+                    if Cat.position in cup_positions:
+                        popup.extra_roll("The Cheshire Cat")
+                    else:
+                        player_turn = True
 
         players_group.draw(screen)
         pygame.display.update()
+
 
 
 if __name__ == "__main__":

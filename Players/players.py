@@ -2,6 +2,8 @@ import pygame
 import random
 import sys
 
+# List of positions with cups (extra roll granted)
+CUPS_POSITIONS = [2, 7, 24]
 
 def display_winner(winner_name):
     font = pygame.font.Font(None, 74)
@@ -28,6 +30,11 @@ def main():
                 # Roll the dice for the current player
                 current_player.dice_roll = roll_dice_animation()
                 current_player.move(current_player.dice_roll)
+
+                # Check if the player landed on a cup position
+                if current_player.position in CUPS_POSITIONS:
+                    print(f"{current_player.name} landed on a cup! Extra roll granted!")
+                    continue  # Grant another turn without switching players
 
                 # Check for a win
                 if current_player.position >= 30:

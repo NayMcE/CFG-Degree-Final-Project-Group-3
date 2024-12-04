@@ -231,28 +231,27 @@ def main():
                 current_player.move(dice_roll)
                 player_turn = False
 
-                # Check if the player landed on a cup position
+
                 if current_player.position in CUPS_POSITIONS:
                     print(f"{current_player.name} landed on a cup! Extra roll granted!")
-                    continue  # Grant another turn without switching players
+                    continue
 
-            if current_player.position >= 30:
-                winner_name = 'Alice' if current_player == Alice else 'The Cheshire Cat'
-                popup.display_winner(winner_name)
-                running = False
-                break
+                if current_player.position >= 30:
+                    winner_name = 'Alice' if current_player == Alice else 'The Cheshire Cat'
+                    popup.display_winner(winner_name)
+                    running = False
+                    break
 
-        if not player_turn:
-            dice_roll = roll_dice_animation()
-            computer_roll = dice_roll
-            Cat.move(dice_roll)
-            player_turn = True
 
-            if current_player.dice_roll != 6:
-                pass
-            else:
-                continue
-            current_player = Cat if current_player == Alice else Alice
+                if not player_turn:
+                    dice_roll = roll_dice_animation()
+                    computer_roll = dice_roll
+                    Cat.move(dice_roll)
+                    player_turn = True
+
+
+                if current_player.dice_roll != 6:
+                     current_player = Cat if current_player == Alice else Alice
 
     players_group.draw(screen)
     pygame.display.update()

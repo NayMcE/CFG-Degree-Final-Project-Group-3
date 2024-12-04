@@ -184,8 +184,6 @@ def get_screen_position(position):
 
     return board_positions.get(position, (0,0))
 
-    return board_positions.get(position, (0, 0))
-
 
 
 class Player(pygame.sprite.Sprite):

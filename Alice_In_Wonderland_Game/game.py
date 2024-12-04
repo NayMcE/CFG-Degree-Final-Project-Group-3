@@ -1,6 +1,7 @@
 import pygame
 import random
 import sys
+
 # Initialize pygame
 pygame.init()
 
@@ -13,6 +14,9 @@ WHITE = (255, 255, 255)
 PINK = (252, 116, 183)
 font = pygame.font.SysFont('Montserrat', 24)
 
+# List of positions with cups (extra roll granted)
+CUPS_POSITIONS = [2, 7, 24]
+
 # Initialize screen
 screen = pygame.display.set_mode((WIDTH + SIDE_PANEL_WIDTH, HEIGHT))
 pygame.display.set_caption("Rabbit Holes and Ladders")
@@ -23,7 +27,7 @@ background_image = pygame.transform.scale(background_image, (WIDTH, HEIGHT))
 
 # load dice images
 dice_images = [pygame.transform.scale(pygame.image.load(f"Images/dice_{i}.jpeg"), (DICE_SIZE, DICE_SIZE))
-    for i in range(1, 7)]
+               for i in range(1, 7)]
 dice_rect = dice_images[0].get_rect(center=(WIDTH + SIDE_PANEL_WIDTH // 2, HEIGHT // 2))
 
 # player images
@@ -45,13 +49,14 @@ def draw_side_panel(player_roll, computer_roll, dice_roll):
     text = font.render(f"Cat rolled: {computer_roll}", True, (0, 0, 0))
     screen.blit(text, (WIDTH + 10, 150))
 
+
 ladders_and_rabbit_holes = {
-    28: 17, #rabbit_hole
-    17: 12, #rabbit_hole
+    28: 17,  #rabbit_hole
+    17: 12,  #rabbit_hole
     12: 1,  #rabbit_hole
-    4: 10, #ladder
-    11: 22, #ladder
-    18: 29 #ladder
+    4: 10,  #ladder
+    11: 22,  #ladder
+    18: 29  #ladder
 }
 
 
@@ -132,6 +137,7 @@ class GamePopup:
         pygame.display.update()
         pygame.time.delay(2000)
 
+
 def roll_dice_animation():
     roll_count = 10  # Number of frames in the roll animation
     for i in range(roll_count):
@@ -139,10 +145,10 @@ def roll_dice_animation():
         random_face = random.choice(dice_images)
         # Clear the dice animation area
         screen.fill(WHITE, (770, 250, DICE_SIZE, DICE_SIZE))
-        screen.blit(random_face, (770,250)) # Animation position
+        screen.blit(random_face, (770, 250))  # Animation position
         # draw_side_panel(3)  # Keep the side panel visible
         pygame.display.update()
-        pygame.time.delay(50) # Short delay to simulate animation
+        pygame.time.delay(50)  # Short delay to simulate animation
 
     # Final roll result
     roll_result = random.randint(1, 6)
@@ -159,10 +165,11 @@ def get_screen_position(position):
         1: (20, 500), 2: (130, 500), 3: (250, 500), 4: (370, 500), 5: (490, 500), 6: (610, 500),
         7: (610, 380), 8: (490, 380), 9: (370, 380), 10: (250, 380), 11: (130, 380), 12: (20, 380),
         13: (20, 260), 14: (130, 260), 15: (250, 260), 16: (370, 260), 17: (490, 260), 18: (610, 260),
-        19: (610, 140), 20: (490, 140), 21: (370, 140), 22: (250, 140), 23: (130, 140), 24: (20,140),
+        19: (610, 140), 20: (490, 140), 21: (370, 140), 22: (250, 140), 23: (130, 140), 24: (20, 140),
         25: (20, 20), 26: (130, 20), 27: (250, 20), 28: (370, 20), 29: (490, 20), 30: (610, 20)
     }
-    return board_positions.get(position, (0,0))
+    return board_positions.get(position, (0, 0))
+
 
 class Player(pygame.sprite.Sprite):
     def __init__(self, id, image):
@@ -176,9 +183,9 @@ class Player(pygame.sprite.Sprite):
         x, y = get_screen_position(self.position)
         self.rect.topleft = (x, y)
 
-    def move(self,steps):
+    def move(self, steps):
         self.position += steps
-        if self.position > 100: #maximise the size of the screen
+        if self.position > 100:  #maximise the size of the screen
             self.position = 100
 
         if self.position in ladders_and_rabbit_holes:
@@ -186,10 +193,11 @@ class Player(pygame.sprite.Sprite):
 
         # update the character position
         x, y = get_screen_position(self.position)
-        self.rect.topleft = (x,y)
+        self.rect.topleft = (x, y)
 
     def draw(self, screen):
         screen.blit(self.image, self.rect.topleft)
+
 
 #create players
 Alice = Player(1, player_images[0])
@@ -223,20 +231,31 @@ def main():
                 current_player.move(dice_roll)
                 player_turn = False
 
+                # Check if the player landed on a cup position
+                if current_player.position in CUPS_POSITIONS:
+                    print(f"{current_player.name} landed on a cup! Extra roll granted!")
+                    continue  # Grant another turn without switching players
+
             if current_player.position >= 30:
                 winner_name = 'Alice' if current_player == Alice else 'The Cheshire Cat'
                 popup.display_winner(winner_name)
                 running = False
                 break
 
-            if not player_turn:
-                dice_roll = roll_dice_animation()
-                computer_roll = dice_roll
-                Cat.move(dice_roll)
-                player_turn = True
+        if not player_turn:
+            dice_roll = roll_dice_animation()
+            computer_roll = dice_roll
+            Cat.move(dice_roll)
+            player_turn = True
 
-        players_group.draw(screen)
-        pygame.display.update()
+            if current_player.dice_roll != 6:
+                pass
+            else:
+                continue
+            current_player = Cat if current_player == Alice else Alice
+
+    players_group.draw(screen)
+    pygame.display.update()
 
 
 if __name__ == "__main__":

@@ -3,7 +3,7 @@
 import unittest
 from unittest.mock import patch
 import pygame
-from game.py import Player, get_screen_position, ladders_and_rabbit_holes, cup_positions, roll_dice_animation
+from game import Player, get_screen_position, ladders_and_rabbit_holes, cup_positions, roll_dice_animation
 
 
 class TestPlayer(unittest.TestCase):

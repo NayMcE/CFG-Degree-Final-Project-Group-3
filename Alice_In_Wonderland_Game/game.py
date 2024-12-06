@@ -98,10 +98,11 @@ class GamePopup:
             "",
             "Rules:",
             "1. Press the SPACEBAR to roll the dice.",
-            "2. You are Alice and will play first. Then the computer, the Cheshire Cat, will play next. \n"
-            "Players take turns moving based on the dice roll.",
-            "3. Ladders move you up; rabbit holes bring you down to the rabbit hole below.",
-            "4. First player to reach position 30 wins!",
+            "2. This is a two player game. First player is Alice, then the second player, the Cheshire Cat, \n will play next."
+            " Players take turns moving based on the dice roll.",
+            "3. Ladders move you up; rabbit holes bring you down to the rabbit hole below.\n"
+            "4. If you land on a cup, you get an extra roll!",
+            "5. First player to reach position 30 wins!",
             "",
             "Press ENTER to start the game.",
         ]

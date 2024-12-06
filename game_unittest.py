@@ -1,21 +1,17 @@
 
-
-import unittest
-from unittest.mock import patch
 import pygame
+import unittest
+from unittest import TestCase
+from unittest.mock import patch
 from game import Player, get_screen_position, ladders_and_rabbit_holes, cup_positions, roll_dice_animation
 
 
-class TestPlayer(unittest.TestCase):
+class TestPlayer(TestCase):
 
     @classmethod
     def setUpClass(cls):
         pygame.init()
         cls.mock_image = pygame.Surface((100, 100))  # Mock image for player
-
-    @classmethod
-    def tearDownClass(cls):
-        pygame.quit()
 
     def setUp(self):
         self.player = Player(1, self.mock_image)

@@ -1,0 +1,239 @@
+Functioning Opening menu & testing exit 
+
+import pygame, sys, os
+
+pygame.init()
+
+# Screen dimensions
+WIDTH, HEIGHT = 900, 500
+WIN = pygame.display.set_mode((WIDTH, HEIGHT))
+pygame.display.set_caption("Alice's Adventure in Wonderland!")
+
+# Colors
+PINK = (255, 182, 193)
+RED = (255, 0, 0)
+GREEN = (0, 255, 0)
+LIGHT_GRAY = (200, 200, 200)
+WHITE = (255, 255, 255)
+
+# Constants for the game
+ALICE_WIDTH, ALICE_HEIGHT = 100, 100
+FPS = 60
+VEL = 5
+
+# Alice's starting points
+alice_points = 0
+
+# Images
+BOARD_IMAGE = pygame.image.load(os.path.join('Assets', 'board.png'))
+ALICE_IMAGE = pygame.image.load(os.path.join('Assets', 'Alice.png'))
+ALICE = pygame.transform.scale(ALICE_IMAGE, (ALICE_WIDTH, ALICE_HEIGHT))
+BOARD = pygame.transform.scale(pygame.image.load(os.path.join('Assets', 'board.png')), (WIDTH, HEIGHT))
+
+
+# Font function for buttons
+def get_font(size):
+    return pygame.font.Font(None, size)
+
+
+# Draw button with hover effect
+def draw_button(text, pos, font, base_color, hover_color):
+    mouse_pos = pygame.mouse.get_pos()
+    button_rect = pygame.Rect(pos[0] - 150, pos[1] - 40, 300, 80)
+
+    if button_rect.collidepoint(mouse_pos):
+        pygame.draw.rect(WIN, hover_color, button_rect)
+    else:
+        pygame.draw.rect(WIN, base_color, button_rect)
+
+    text_surf = font.render(text, True, RED)
+    text_rect = text_surf.get_rect(center=button_rect.center)
+    WIN.blit(text_surf, text_rect)
+
+    return button_rect
+
+
+# Game logic for Alice - displaying her movement
+def draw_window(alice_position):
+    WIN.blit(BOARD, (0, 0))
+    WIN.blit(ALICE, (alice_position.x, alice_position.y))
+    pygame.display.update()
+
+## basic movement for alice - move across board using keys
+def alice_handle_movement(keys_pressed, alice_position):
+    if keys_pressed[pygame.K_LEFT] and alice_position.x - VEL > 0:
+        alice_position.x -= VEL
+    if keys_pressed[pygame.K_RIGHT] and alice_position.x + VEL + ALICE_WIDTH < WIDTH:
+        alice_position.x += VEL
+    if keys_pressed[pygame.K_UP] and alice_position.y - VEL > 0:
+        alice_position.y -= VEL
+    if keys_pressed[pygame.K_DOWN] and alice_position.y + VEL + ALICE_HEIGHT < HEIGHT - 15:
+        alice_position.y += VEL
+
+
+def main_game():
+    alice_position = pygame.Rect(100, 400, ALICE_WIDTH, ALICE_HEIGHT)
+    clock = pygame.time.Clock()
+    run = True
+    while run:
+        clock.tick(FPS)
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                run = False
+
+        keys_pressed = pygame.key.get_pressed()
+        alice_handle_movement(keys_pressed, alice_position)
+        draw_window(alice_position)
+
+    pygame.quit()
+
+
+# Main pop-up menu
+def main_menu():
+    while True:
+        WIN.fill(PINK)
+        menu_mouse_pos = pygame.mouse.get_pos()
+
+        # Draw "Main Menu" title
+        menu_text = get_font(100).render("MAIN MENU", True, RED)
+        menu_rect = menu_text.get_rect(center=(WIDTH // 2, 100))
+        WIN.blit(menu_text, menu_rect)
+
+        # Draw Play, Options, Quit buttons
+        play_button_rect = draw_button("PLAY", (WIDTH // 2, 250), get_font(75), LIGHT_GRAY, WHITE)
+        options_button_rect = draw_button("DIRECTIONS", (WIDTH // 2, 400), get_font(65), LIGHT_GRAY, WHITE)
+
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                sys.exit()
+            if event.type == pygame.MOUSEBUTTONDOWN:
+                if play_button_rect.collidepoint(menu_mouse_pos):
+                    main_game()  # Start the game when PLAY button is clicked
+                if options_button_rect.collidepoint(menu_mouse_pos):
+                    options()  # Show options (game directions) when clicked
+
+        pygame.display.update()
+
+
+## directions menu
+def options():
+    while True:
+        WIN.fill(PINK)
+        options_mouse_pos = pygame.mouse.get_pos()
+
+        # Draw "Game Directions" title
+        options_text = get_font(50).render("GAME DIRECTIONS", True, RED)
+        options_rect = options_text.get_rect(center=(WIDTH // 2, 100))
+        WIN.blit(options_text, options_rect)
+
+        # Display game instructions
+        instructions = [
+            "Roll the dice to see how far you go --- "
+
+            "Press Enter to move Alice!",
+
+            "Land on Tea Cups for extra rolls!",
+
+            "Climb the ladders to rise up the board!",
+
+            "Beware of Rabbit Holes - it's a long way back down!"
+        ]
+
+        y_offset = 200
+        for line in instructions:
+            instruction_text = get_font(30).render(line, True, RED)
+            instruction_rect = instruction_text.get_rect(center=(WIDTH // 2, y_offset))
+            WIN.blit(instruction_text, instruction_rect)
+            y_offset += 60
+
+        # Draw Back button after entering directions
+        back_button_rect = draw_button("BACK", (WIDTH // 2, 450), get_font(75), LIGHT_GRAY, WHITE)
+
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                sys.exit()
+            if event.type == pygame.MOUSEBUTTONDOWN:
+                if back_button_rect.collidepoint(options_mouse_pos):
+                    return  # Go back to the main menu when "BACK" button is clicked
+
+        pygame.display.update()
+
+## re-pop up of menu bar + include 'GAME OVER' + 'GAME LOST' + MUST STILL INCLUDE CONNECTION FROM DATABASE FOR SCORING
+def game_over():
+
+    while game_over:
+        WIN.fill(PINK)
+        menu_mouse_pos = pygame.mouse.get_pos()
+
+        # Displaying "Game Over" message
+        game_over_text = get_font(100).render("GAME OVER", True, RED)
+        game_over_rect = game_over_text.get_rect(center=(WIDTH // 2, 100))
+        WIN.blit(game_over_text, game_over_rect)
+
+        # Displaying "You Lost" message
+        you_lost_text = get_font(50).render("You Lost! Better Luck Next Time", True, RED)
+        you_lost_rect = you_lost_text.get_rect(center=(WIDTH // 2, 200))
+        WIN.blit(you_lost_text, you_lost_rect)
+
+        # Drawing same buttons for "Play Again," "Directions," and "Quit"
+        play_button_rect = draw_button("PLAY AGAIN", (WIDTH // 2, 300), get_font(75), LIGHT_GRAY, WHITE)
+        directions_button_rect = draw_button("DIRECTIONS", (WIDTH // 2, 400), get_font(65), LIGHT_GRAY, WHITE)
+        quit_button_rect = draw_button("QUIT", (WIDTH // 2, 500), get_font(75), LIGHT_GRAY, WHITE)
+
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                sys.exit()
+            if event.type == pygame.MOUSEBUTTONDOWN:
+                if play_button_rect.collidepoint(menu_mouse_pos):
+                    main_game()  # Restart the game when "PLAY AGAIN" is clicked
+                if directions_button_rect.collidepoint(menu_mouse_pos):
+                    options()  # Show game directions
+                if quit_button_rect.collidepoint(menu_mouse_pos):
+                    pygame.quit()
+                    sys.exit()  # Quit the game when "QUIT" is clicked
+
+        pygame.display.update()
+
+def game_over_won():
+
+    while game_over_won():
+        WIN.fill(PINK)
+        menu_mouse_pos = pygame.mouse.get_pos()
+
+        # Displaying "Game Over" message
+        game_over_text = get_font(100).render("GAME OVER", True, RED)
+        game_over_rect = game_over_text.get_rect(center=(WIDTH // 2, 100))
+        WIN.blit(game_over_text, game_over_rect)
+
+        # Displaying "You Lost" message
+        you_lost_text = get_font(50).render("You Won! You freed Wonderland!", True, RED)
+        you_lost_rect = you_lost_text.get_rect(center=(WIDTH // 2, 200))
+        WIN.blit(you_lost_text, you_lost_rect)
+
+        # Drawing same buttons for "Play Again," "Directions," and "Quit"
+        play_button_rect = draw_button("PLAY AGAIN", (WIDTH // 2, 300), get_font(75), LIGHT_GRAY, WHITE)
+        directions_button_rect = draw_button("DIRECTIONS", (WIDTH // 2, 400), get_font(65), LIGHT_GRAY, WHITE)
+        quit_button_rect = draw_button("QUIT", (WIDTH // 2, 500), get_font(75), LIGHT_GRAY, WHITE)
+
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                sys.exit()
+            if event.type == pygame.MOUSEBUTTONDOWN:
+                if play_button_rect.collidepoint(menu_mouse_pos):
+                    main_game()  # Restart the game when "PLAY AGAIN" is clicked
+                if directions_button_rect.collidepoint(menu_mouse_pos):
+                    options()  # Show game directions
+                if quit_button_rect.collidepoint(menu_mouse_pos):
+                    pygame.quit()
+                    sys.exit()  # Quit the game when "QUIT" is clicked
+
+        pygame.display.update()
+
+
+# Run the main menu
+if __name__ == "__main__":
+    main_menu()

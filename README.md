@@ -83,8 +83,8 @@ Setup
 
 1. Launch the game to see the main menu.
 2. Choose "Play" to start the game, "Directions" to view instructions, or "Quit" to exit.
-3. Press the spacebar to roll the dice and move Alice across the board.
-4. Collect tea cups, avoid rabbit holes, and climb ladders to reach the final square before the Cheshire Cat.
+3. Press the spacebar to roll the dice and move your character across the board. Alice rolls first.
+4. Get an extra roll on the tea cup, avoid rabbit holes, and climb ladders to reach the final square.
 5. The game alternates turns between Alice and the Cheshire Cat, with progress displayed in the sidebar.
 
 ----------------------------------------------------------

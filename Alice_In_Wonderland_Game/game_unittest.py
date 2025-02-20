@@ -116,6 +116,8 @@ class TestPlayer(TestCase):
         self.assertIn(self.Alice.position, cup_positions)
         self.assertNotIn(self.Cat.position, cup_positions)
 
+add
+
 
 if __name__ == '__main__':
     unittest.main()
